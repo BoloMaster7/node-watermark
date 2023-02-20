@@ -1,5 +1,8 @@
 const Jimp = require('jimp');
 const inquirer = require('inquirer');
+// import { existsSync } from 'node:fs';
+const fs = require('fs');
+
 
 const addTextWatermarkToImage = async function(inputFile, outputFile, text) {
   const image = await Jimp.read(inputFile);
@@ -56,6 +59,9 @@ const startApp = async () => {
     choices: ['Text watermark', 'Image watermark'],
   }]);
 
+  if (!fs.existsSync('/img/test.jpg'))
+  console.log('Something went wrong... Try again');
+  
   if(options.watermarkType === 'Text watermark') {
     const text = await inquirer.prompt([{
       name: 'value',
@@ -63,9 +69,11 @@ const startApp = async () => {
       message: 'Type your watermark text:',
     }])
     options.watermarkText = text.value;
+  
     addTextWatermarkToImage('./img/' + options.inputImage, './img/' + prepareOutputFilename(options.inputImage), options.watermarkText);
   }
   else {
+    if ((fs.existsSync('/img/test.jpg')) && (fs.existsSync('/img/logo.png'))){
     const image = await inquirer.prompt([{
       name: 'filename',
       type: 'input',
@@ -74,6 +82,7 @@ const startApp = async () => {
     }])
     options.watermarkImage = image.filename;
     addImageWatermarkToImage('./img/' + options.inputImage, './img/' + prepareOutputFilename(options.inputImage), './img/' + options.watermarkImage);
+    }else  {console.log('Something went wrong... Try again');}
   }
 
 };
